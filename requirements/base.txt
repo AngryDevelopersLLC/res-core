@@ -1,0 +1,5 @@
+psycopg2==2.6.1
+aiopg==0.7.0
+sqlalchemy==1.0.8
+# 0.2.5 will be fixed but it is not ready yet
+git+https://bitbucket.org/youtux/asyncio-mongo.git@9e58d0c#egg=asyncio_mongo
