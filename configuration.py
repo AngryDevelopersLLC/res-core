@@ -26,6 +26,9 @@ class Config(object):
         if __protected__ is not None and self in __protected__:
             del __protected__[self]
 
+    def get(self, name, default):
+        return self.__content__.get(name, default)
+
     def update(self, value):
         if self == r and __initialized__:
             raise ValueError("Root updates are disabled")
