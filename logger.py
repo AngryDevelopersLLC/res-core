@@ -193,19 +193,33 @@ class Logger(object):
         logging.getLogger("Logger").info("Continuing to log in %s", file_name)
 
     @staticmethod
-    def duplicate_all_logging_to_mongo(docid, nodeid):
-        handler = MongoLogHandler(docid=docid, nodeid=nodeid, **r.logs.db)
+    @asyncio.coroutine
+    def duplicate_logs_to_mongo(root_path, docid, nodeid):
+        handler = MongoLogHandler(
+            root_path=root_path, docid=docid, nodeid=nodeid, **r.logs.db)
+        yield from handler.initialize()
         logging.getLogger("Logger").info(
             "Saving logs to Mongo on %s:%d (%s)",
-            r.logs.db.host, r.logs.db.port, r.logs.db.name)
+            r.logs.db.host, r.logs.db.port, r.logs.db.db)
         logging.getLogger().addHandler(handler)
 
-    def change_log_message(self, msg):
+    @staticmethod
+    @asyncio.coroutine
+    def discard_logs_to_mongo():
+        to_remove = []
+        for handler in logging.getLogger().handlers:
+            if isinstance(handler, MongoLogHandler):
+                yield from handler.disconnect()
+                to_remove.append(handler)
+        for h in to_remove:
+            logging.getLogger().handlers.remove(h)
+
+    def _change_log_message(self, msg):
         return msg
 
     def msg_changeable(fn):
         def msg_changeable_wrapper(self, msg, *args, **kwargs):
-            msg = self.change_log_message(msg)
+            msg = self._change_log_message(msg)
             return fn(self, msg, *args, **kwargs)
 
         msg_changeable_wrapper.__name__ = fn.__name__ + "_msg_changeable"
@@ -278,15 +292,30 @@ class Logger(object):
 
 
 class MongoLogHandler(logging.Handler):
-    def __init__(self, docid, nodeid, host, port=27017, db="res_accounting",
-                 user=None, password=None, level=logging.NOTSET):
+    def __init__(self, root_path, docid, nodeid, host, port=27017,
+                 db="res_accounting", user=None, password=None,
+                 level=logging.NOTSET):
         super(MongoLogHandler, self).__init__(level)
-        self._client = yield from asyncio_mongo.Connection.create(
-            host, port, db, user, password)
-        self._db = getattr(self._client, db)
-        self._collection = self._db.logs
+        self._client = host, port, db, user, password
+        self._db = None
+        self._collection = None
         self._log_id = docid
         self._node_id = nodeid
+        self._root_path = root_path
+
+    @asyncio.coroutine
+    def initialize(self):
+        db = self._client[2]
+        self._client = yield from asyncio_mongo.Connection.create(
+            *self._client)
+        self._db = getattr(self._client, db)
+        self._collection = self._db.logs
+
+    @asyncio.coroutine
+    def disconnect(self):
+        client = self._client
+        self._client = None
+        return client.disconnect()
 
     @property
     def log_id(self):
@@ -297,7 +326,8 @@ class MongoLogHandler(logging.Handler):
         return self._node_id
 
     def emit(self, record):
-        global ROOT_PATH
+        if self._client is None:
+            return
         data = dict(record.__dict__)
         for bs in ("levelno", "args", "msg", "module", "msecs", "processName"):
             del data[bs]
@@ -308,11 +338,12 @@ class MongoLogHandler(logging.Handler):
         data["session"] = self.log_id
         data["node"] = self.node_id
         data["pathname"] = pathname = os.path.normpath(data["pathname"])
-        if os.path.isabs(pathname) and pathname.startswith(ROOT_PATH):
-            data["pathname"] = os.path.relpath(data["pathname"], ROOT_PATH)
+        if os.path.isabs(pathname) and pathname.startswith(self._root_path):
+            data["pathname"] = os.path.relpath(
+                data["pathname"], self._root_path)
         if data["exc_info"] is not None:
             data["exc_info"] = repr(data["exc_info"])
-        asyncio.async(self._collection.insert(data, w=0))
+        asyncio.async(self._collection.insert(data))
 
 
 def init_argument_parser(parser):
