@@ -3,3 +3,4 @@ aiopg==0.7.0
 sqlalchemy==1.0.8
 # 0.2.5 will be fixed but it is not ready yet
 git+https://bitbucket.org/vmarkovtsev/asyncio-mongo.git#egg=asyncio_mongo
+pytrie==0.2
