@@ -4,6 +4,7 @@
 
 
 from collections import defaultdict
+import json
 import logging
 import os
 from pprint import pprint
@@ -125,6 +126,11 @@ def init_argument_parser(parser):
     return parser
 
 
+def apply_config(path):
+    with open(path, "r") as fin:
+        r.update(json.load(fin))
+
+
 def initialize():
     global r
     logger = logging.getLogger("Config")
@@ -133,29 +139,22 @@ def initialize():
             os.getenv("RES_CONFIG"):
         if not path:
             continue
-        cfgpath = os.path.join(path, "%s.py" % CONFIG_FILE_NAME)
+        cfgpath = os.path.join(path, "%s.json" % CONFIG_FILE_NAME)
         if not os.path.exists(cfgpath):
             continue
-        sys.path.insert(0, path)
         try:
-            __import__(os.path.splitext(CONFIG_FILE_NAME)[0]).update(r)
+            apply_config(cfgpath)
         except Exception as e:
             logger.warning("Failed to configure from %s: %s", cfgpath, e)
-        finally:
-            del sys.path[0]
     parser = init_argument_parser(get_argument_parser())
     args, _ = parser.parse_known_args()
     if args.cfgfile:
-        sys.path.insert(0, os.path.dirname(args.cfgfile))
         try:
-            __import__(
-                os.path.splitext(os.path.basename(args.cfgfile))[0]).update(r)
+            apply_config(args.cfgfile)
         except Exception as e:
             logger.critical("Failed to apply configuration from %s: %s",
                             args.cfgfile, e)
             raise e from None
-        finally:
-            del sys.path[0]
     try:
         exec("\n".join(args.overrides))
     except Exception as e:
