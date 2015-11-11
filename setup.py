@@ -29,7 +29,7 @@ setup(
     author_email="gmarkhor@gmail.com",
     url="http://dev.res-it.net/gerrit/#/q/project:res-service-core",
     download_url='http://dev.res-it.net/gerrit/#/q/project:res-service-core',
-    packages=["res.core"],
+    packages=["res", "res.core"],
     install_requires=parse_requirements(),
     package_data={"": ["res/core/requirements/base.txt"]},
     classifiers=[
