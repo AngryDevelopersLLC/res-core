@@ -194,7 +194,14 @@ class Logger(object):
 
     @staticmethod
     @asyncio.coroutine
-    def duplicate_logs_to_mongo(root_path, docid, nodeid):
+    def duplicate_logs_to_mongo(docid, nodeid, root_path=None):
+        parser = init_argument_parser(get_argument_parser())
+        args, _ = parser.parse_known_args()
+        if args.disable_logging_to_mongo:
+            return
+        if root_path is None:
+            root_path = \
+                os.path.dirname(next(iter(sys.modules["res"].__path__)))
         handler = MongoLogHandler(
             root_path=root_path, docid=docid, nodeid=nodeid, **r.logs.db)
         yield from handler.initialize()
@@ -350,4 +357,5 @@ def init_argument_parser(parser):
     parser.add_argument('-v', '--verbose', action='count', default=0,
                         help="stdout log verbosity (may be set multiple times "
                              "for more verbosity)")
+    parser.add_argument("--disable-logging-to-mongo", action="store_true")
     return parser
