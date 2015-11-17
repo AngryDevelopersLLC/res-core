@@ -350,7 +350,22 @@ class MongoLogHandler(logging.Handler):
                 data["pathname"], self._root_path)
         if data["exc_info"] is not None:
             data["exc_info"] = repr(data["exc_info"])
-        asyncio.async(self._collection.insert(data))
+        if "_id" in data:
+            print(str(data["_id"]))
+            data["_id"] = str(data["_id"])
+
+        @asyncio.coroutine
+        def insert():
+            try:
+                yield from self._collection.insert(data)
+            except Exception as e:
+                # https://bitbucket.org/mrdon/asyncio-mongo/pull-requests/1/update-bson-to-support-mongodb-26/diff
+                sys.stderr.write(
+                    "Failed to send the message to Mongo: %s: %s\n" %
+                    (type(e), e))
+            sys.stderr.flush()
+
+        asyncio.async(insert())
 
 
 def init_argument_parser(parser):
