@@ -58,6 +58,7 @@ class Config(object):
         print('Configuration "%s":' % self.__path__, file=file)
         pprint(fix_contents(self), indent=indent, width=width, stream=file)
         print('-' * width, file=file)
+        sys.stdout.flush()
 
     def __update__(self, tree):
         for k, v in tree.items():

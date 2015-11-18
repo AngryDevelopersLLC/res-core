@@ -9,6 +9,7 @@ import sys
 
 ARGPARSE_DESCRIPTION = "Change res.core.argument_parser.ARGPARSE_DESCRIPTION!"
 
+
 def get_argument_parser():
     return argparse.ArgumentParser(description=ARGPARSE_DESCRIPTION)
 
