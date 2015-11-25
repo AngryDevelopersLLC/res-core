@@ -1,3 +1,6 @@
+.pybuild
+debian/res-core*
+debian/files
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
