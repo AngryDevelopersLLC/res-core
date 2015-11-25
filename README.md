@@ -19,3 +19,5 @@ It supposes [asyncio](http://asyncio.org/) environment.
 * `systemd_watchdog.py` - [systemd](https://en.wikipedia.org/wiki/Systemd)
   watchdog wrapper (used in modern Debian/Ubuntu versions).
 * `utils.py` - various random functions.
+
+Released under New BSD license.
