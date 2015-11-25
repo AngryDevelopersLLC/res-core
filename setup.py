@@ -50,7 +50,7 @@ def parse_requirements():
 setup(
     name="res-core",
     description="Resystem common service package",
-    version="1.0.0",
+    version="1.0.1",
     license="New BSD",
     author="Vadim Markovtsev",
     author_email="gmarkhor@gmail.com",
@@ -58,9 +58,9 @@ setup(
     download_url='https://github.com/AngryDevelopersLLC/res-core',
     packages=["res", "res.core"],
     install_requires=parse_requirements(),
-    package_data={"": ["res/core/requirements/base.txt"]},
+    package_data={"": ["LICENSE", "README.md", "requirements.txt"]},
     classifiers=[
-        "Development Status :: 5 - Stable",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
