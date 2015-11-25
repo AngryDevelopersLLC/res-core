@@ -12,5 +12,4 @@ export PYBUILD_DISABLE=test
 override_dh_install:
 	dh_install
 	mkdir -p debian/res-core/usr/share/res/core
-	cp res/core/requirements/base.txt debian/res-core/usr/share/res/core/requirements.txt
-
+	cp requirements.txt LICENSE README.md debian/res-core/usr/share/res/core
