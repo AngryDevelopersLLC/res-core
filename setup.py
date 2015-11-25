@@ -31,8 +31,7 @@ import os
 
 
 def parse_requirements():
-    path = os.path.join(os.path.dirname(__file__), "res", "core",
-                        "requirements", "base.txt")
+    path = os.path.join(os.path.dirname(__file__), "requirements.txt")
     reqs = []
     with open(path, "r") as fin:
         for r in fin.read().split("\n"):
