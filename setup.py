@@ -52,7 +52,7 @@ def parse_requirements():
 setup(
     name="res-core",
     description="Resystem common service package",
-    version="1.0.3",
+    version="1.0.4",
     license="New BSD",
     author="Vadim Markovtsev",
     author_email="gmarkhor@gmail.com",
@@ -62,7 +62,7 @@ setup(
     install_requires=parse_requirements(),
     package_data={"": ["LICENSE", "README.md", "requirements.txt"]},
     dependency_links=['git+https://bitbucket.org/vmarkovtsev/asyncio-mongo.git'
-                      '@0.2.5#egg=asyncio_mongo-0.2.5'],
+                      '@0.2.5#egg=asyncio_mongo-0.2.5.dev0'],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
