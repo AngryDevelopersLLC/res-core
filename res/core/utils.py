@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Resystem common service package.
 Released under New BSD License.
