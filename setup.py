@@ -52,7 +52,7 @@ def parse_requirements():
 setup(
     name="res-core",
     description="Resystem common service package",
-    version="1.0.2",
+    version="1.0.3",
     license="New BSD",
     author="Vadim Markovtsev",
     author_email="gmarkhor@gmail.com",
