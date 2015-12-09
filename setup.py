@@ -39,8 +39,10 @@ def parse_requirements():
             if r.startswith("#") or not r:
                 continue
             if r.startswith("git+"):
-                print("Warning: git dependencies cannot be used in setuptools "
-                      "(%s)" % r)
+                _, egg = r.split('#')
+                _, egg = egg.split("=")
+                name, version = egg.split('-')
+                reqs.append("%s==%s" % (name, version))
                 continue
             if not r.startswith("-r"):
                 reqs.append(r)
@@ -50,7 +52,7 @@ def parse_requirements():
 setup(
     name="res-core",
     description="Resystem common service package",
-    version="1.0.1",
+    version="1.0.2",
     license="New BSD",
     author="Vadim Markovtsev",
     author_email="gmarkhor@gmail.com",
@@ -59,6 +61,8 @@ setup(
     packages=["res", "res.core"],
     install_requires=parse_requirements(),
     package_data={"": ["LICENSE", "README.md", "requirements.txt"]},
+    dependency_links=['git+https://bitbucket.org/vmarkovtsev/asyncio-mongo.git'
+                      '@0.2.5#egg=asyncio_mongo-0.2.5'],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
